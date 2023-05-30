@@ -1,0 +1,108 @@
+import { MockData, PoolKeys, GeneratorArray, MockObject, MockArray } from '@/type'
+import { isFunction, isNil, isObject, isString, isUndefined, sample } from 'lodash'
+import { mockNumber, mockText, mockBoolean, mockDate } from './base'
+import { MockDateClass } from './utils'
+
+export class Mock implements MockData {
+    private templateMap: Record<string, (() => any) | string> = {
+        ...mockText,
+        ...mockNumber,
+        ...mockBoolean,
+        ...mockDate,
+
+        string: this.string,
+        number: this.number,
+        boolean: this.boolean,
+        time: this.time,
+    }
+
+    private get formatPatterRegex() {
+        //转化成 匹配 /@(aFunc|bFunc)/
+        return new RegExp(`@(${Object.keys(this.templateMap).join('|')})`, 'g')
+    }
+
+    constructor(templateMap?: Record<string, () => any | string>) {
+        if (templateMap) {
+            Object.entries(templateMap).forEach(([key, func]) => this.define(key, func))
+        }
+    }
+
+    string(length: number = 10, poolKey: PoolKeys = 'alpha'): string {
+        return mockText.text({
+            min: length,
+            max: length,
+            poolKey,
+        })
+    }
+
+    number(min?: number, max?: number): number {
+        if (isString(min) || isString(max)) {
+            throw new TypeError('min和max应该是字符串')
+        }
+        if (!isUndefined(min) && !isUndefined(max) && min > max) {
+            throw new RangeError('max < min')
+        }
+        return mockNumber.intNum(min, max) as number
+    }
+
+    boolean(): boolean {
+        return mockBoolean.randomBool()
+    }
+
+    date(min?: Date, max?: Date): MockDateClass {
+        return mockDate.randomDate(min, max)
+    }
+
+    time(): string {
+        return mockDate.dateTimeString()
+    }
+
+    array<T = string>(
+        length: number = mockNumber.intNum(3, 7),
+        ...generators: GeneratorArray<T>
+    ): T[] {
+        generators.length === 0 && generators.push(mockText.text as () => T)
+        return Array.from({ length }).map(() => sample(generators)!())
+    }
+
+    template(template: string): string {
+        return template.replace(this.formatPatterRegex, ($0: string, p: string): string => {
+            const func = this.templateMap[p] as Function | string
+            return isFunction(func) ? func().toString() : func
+        })
+    }
+
+    templateArray(template: MockArray): MockArray {
+        return template.map(value => {
+            if (typeof value === 'string') {
+                return this.template(value)
+            } else if (Array.isArray(value)) {
+                return this.templateArray(value)
+            } else if (isObject(value)) {
+                return this.templateObject(value)
+            } else {
+                throw new Error(`${value} 类型不支持,支持string,array,object类型`)
+            }
+        })
+    }
+
+    templateObject(template: MockObject): MockObject {
+        if (isNil(template)) return template
+        return Object.entries(template).reduce((pre, [key, value]) => {
+            if (typeof value === 'string') {
+                pre[this.template(key)] = this.template(value)
+            } else if (Array.isArray(value)) {
+                pre[this.template(key)] = this.templateArray(value)
+            } else if (isObject(value)) {
+                pre[this.template(key)] = this.templateObject(value)
+            } else {
+                pre[this.template(key)] = value
+            }
+            return pre
+        }, {} as MockObject)
+    }
+
+    define<T>(name: string, generator: (() => T) | string): void {
+        this.templateMap[name] = generator
+    }
+}
