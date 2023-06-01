@@ -46,7 +46,7 @@ export const floatNum = (min?: MaybeNumber, max?: MaybeNumber, fixed?: number) =
     if (isUndefined(fixed)) {
         return result
     } else {
-        const fixedNum = result.toFixed(fixed)
-        return parseFloat(fixedNum)
+        result = parseFloat(result.toFixed(fixed))
+        return result
     }
 }

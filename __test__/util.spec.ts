@@ -125,48 +125,55 @@ describe('utils', () => {
         })
     })
 
+    const timezoneOffset = new Date().getTimezoneOffset() * 60 * 1000
+    const getTime = (str: string) => {
+        return new Date(new Date(str).getTime() + timezoneOffset)
+    }
+
     describe('MockDateClass', () => {
         test('format方法能够正确格式化日期', () => {
-            const date = new MockDateClass('2023-05-30T12:34:56.789Z')
-            expect(date.format('yyyy-MM-dd HH:mm:ss.SSS')).toBe('2023-05-30 20:34:56.789')
+            const date = new MockDateClass(
+                new Date('2023-05-30T12:34:56.789Z').getTime() + timezoneOffset,
+            )
+            expect(date.format('yyyy-MM-dd HH:mm:ss.SSS')).toBe('2023-05-30 12:34:56.789')
         })
     })
 
     describe('formatDate', () => {
         test('能够正确格式化日期', () => {
-            const date = new Date('2023-05-30T12:34:56.789Z')
-            expect(formatDate(date, 'yyyy-MM-dd HH:mm:ss.SSS')).toBe('2023-05-30 20:34:56.789')
+            const date = getTime('2023-05-30T12:34:56.789Z')
+            expect(formatDate(date, 'yyyy-MM-dd HH:mm:ss.SSS')).toBe('2023-05-30 12:34:56.789')
         })
 
         test('能够正确处理单个格式化字符', () => {
-            const date = new Date('2023-05-30T12:34:56.789Z')
+            const date = getTime('2023-05-30T12:34:56.789Z')
             expect(formatDate(date, 'yyyy')).toBe('2023')
         })
 
         test('能够正确处理重复的格式化字符', () => {
-            const date = new Date('2023-05-03T01:02:03.004Z')
+            const date = getTime('2023-05-03T01:02:03.004Z')
             expect(formatDate(date, 'yyyy-MM-dd HH:mm:ss.SSS SSS a')).toBe(
-                '2023-05-03 09:02:03.004 004 am',
+                '2023-05-03 01:02:03.004 004 am',
             )
         })
 
         test('能够正确处理不带前导零的格式化字符', () => {
-            const date = new Date('2023-05-30T14:34:56.012Z')
-            expect(formatDate(date, 'y-M-d h:m:s.S a')).toBe('23-5-30 10:34:56.12 pm')
+            const date = getTime('2023-05-30T14:34:56.012Z')
+            expect(formatDate(date, 'y-M-d h:m:s.S a')).toBe('23-5-30 2:34:56.12 pm')
         })
 
         test('能够正确处理12小时制的格式化字符', () => {
-            const date = new Date('2023-05-30T12:34:56.789Z')
-            expect(formatDate(date, 'hh:mm:ss A')).toBe('08:34:56 PM')
+            const date = getTime('2023-05-30T12:34:56.789Z')
+            expect(formatDate(date, 'hh:mm:ss A')).toBe('00:34:56 PM')
         })
 
         test('能够正确处理小于10的日期部分', () => {
-            const date = new Date('2023-05-03T01:02:03.004Z')
-            expect(formatDate(date, 'yyyy-MM-dd HH:mm:ss.SS A')).toBe('2023-05-03 09:02:03.004 AM')
+            const date = getTime('2023-05-03T01:02:03.004Z')
+            expect(formatDate(date, 'yyyy-MM-dd HH:mm:ss.SS A')).toBe('2023-05-03 01:02:03.004 AM')
         })
 
         test('能够正确处理毫秒部分', () => {
-            const date = new Date('2023-05-30T12:34:56.007Z')
+            const date = getTime('2023-05-30T12:34:56.007Z')
             expect(formatDate(date, 'SSS')).toBe('007')
         })
     })
