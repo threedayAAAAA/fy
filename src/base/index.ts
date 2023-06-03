@@ -1,0 +1,5 @@
+export * as MockNumber from './number'
+export * as MockString from './string'
+export * as MockBoolean from './boolean'
+export * as MockDate from './date'
+export * as MockTime from './time'
