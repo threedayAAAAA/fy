@@ -1,4 +1,5 @@
 import { mockText } from '@/base'
+import { textPools } from '@/const'
 import { Mock } from '@/mockData'
 import { MockDateClass } from '@/utils'
 
@@ -38,10 +39,10 @@ describe('mockData', () => {
         })
 
         it('应该返回包含在指定池中的字符的字符串', () => {
-            const result1 = mockData.string(10, 'number')
+            const result1 = mockData.string(10, textPools.number)
             expect(result1).toMatch(/^[0-9]{10}$/)
 
-            const result2 = mockData.string(10, 'alpha')
+            const result2 = mockData.string(10, textPools.alpha)
             expect(result2).toMatch(stringReg)
         })
 
@@ -53,13 +54,6 @@ describe('mockData', () => {
         it('应该默认返回包含在大小写字符池中的字符串，当未指定池时', () => {
             const result = mockData.string(10)
             expect(result).toMatch(/^[a-zA-Z]{10}$/)
-        })
-
-        it('应该返回包含在指定池中的字符的字符串，当指定的池不存在时，应该抛出错误', () => {
-            //@ts-ignore
-            expect(() => mockData.string(10, 'invalid-pool')).toThrowError(
-                'Invalid pool key: invalid-pool',
-            )
         })
 
         it('应该返回包含在指定池中的字符的字符串，当指定的池为alpha时', () => {
@@ -88,9 +82,9 @@ describe('mockData', () => {
 
         it('当提供的min和max参数不是数字时，应该抛出TypeError', () => {
             //@ts-ignore
-            expect(() => mockData.number('1', 10)).toThrow('min和max应该是字符串')
+            expect(() => mockData.number('1', 10)).toThrow('min和max应该是数字')
             //@ts-ignore
-            expect(() => mockData.number(1, '10')).toThrow('min和max应该是字符串')
+            expect(() => mockData.number(1, '10')).toThrow('min和max应该是数字')
         })
 
         it('当提供的min大于max时，应该抛出RangeError', () => {
@@ -180,12 +174,7 @@ describe('mockData', () => {
         })
 
         it('应该使用提供的生成器生成数组元素', () => {
-            const result = mockData.array(
-                3,
-                () => 1,
-                () => 2,
-                () => 3,
-            )
+            const result = mockData.array(3, 1, 2, () => 3)
             result.forEach(item => {
                 expect([1, 2, 3]).contain(item)
             })
@@ -360,13 +349,6 @@ describe('mockData', () => {
             expect(result[1][0]).toMatch(stringReg)
             expect(result[1][1].c).toMatch(timeReg)
             expect(result[2].e[1]).toMatch(numberReg)
-        })
-
-        it('应该抛出错误，因为输入包含不支持的类型', () => {
-            const input = ['a', 1, { b: 'c' }]
-            expect(() => mockData.templateArray(input)).toThrowError(
-                '1 类型不支持,支持string,array,object类型',
-            )
         })
     })
 

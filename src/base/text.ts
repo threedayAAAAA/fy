@@ -1,20 +1,17 @@
 import { textPools } from '../const'
 import { intNum, natural } from './number'
-import { MaybeNumber, PoolKeys } from '../type'
+import { MaybeNumber } from '../type'
 import { isUndefined, sample } from 'lodash'
 import { formatDate } from '@/utils'
 import { randomDate } from './date'
 /**
  * 从指定字符池中随机生成一个字符
- * @param {PoolKeys} [poolKey='all'] 字符池的键名
+ * @param {string} [poolKey= textPools.all] 字符池的键名
  * @returns {string} 生成的字符
  */
-export const character = (poolKey: PoolKeys = 'all') => {
-    if (!Object.keys(textPools).includes(poolKey)) {
-        throw new Error(`Invalid pool key: ${poolKey}`)
-    }
-    const pool = textPools[poolKey]
-    return pool.charAt(natural(0, pool.length - 1))
+export const character = (textPool = textPools.all) => {
+    if (!(textPool?.length > 0)) throw 'character textPool应该为长度大于一的字符串'
+    return textPool.charAt(natural(0, textPool.length - 1))
 }
 
 /**
@@ -22,22 +19,22 @@ export const character = (poolKey: PoolKeys = 'all') => {
  * @param {Object} [params={}] 参数对象
  * @param {MaybeNumber} [params.min=3] 最小长度
  * @param {MaybeNumber} [params.max=7] 最大长度
- * @param {PoolKeys} [params.poolKey='all'] 字符池的键名
+ * @param {string} [params.textPool=textPools.all] 字符池的键名
  * @returns {string} 生成的随机字符串
  */
 export const text = (
     params: {
+        textPool?: string
         min?: MaybeNumber
         max?: MaybeNumber
-        poolKey?: PoolKeys
     } = {},
-) => {
-    let { min, max, poolKey = 'all' } = params
+): string => {
+    let { min, max, textPool = 'all' } = params
     if (isUndefined(min) && isUndefined(max)) {
         min = 3
         max = 7
     }
-    return Array.from({ length: natural(min, max) }, () => character(poolKey)).join('')
+    return Array.from({ length: natural(min, max) }, () => character(textPool)).join('')
 }
 
 /**
@@ -46,9 +43,7 @@ export const text = (
  */
 export const phone = () => {
     const prefix = sample(['130', '131', '132', '133', '135', '137', '138', '170', '187', '189'])
-    const suffix = Array.from({ length: 8 })
-        .map(() => natural(0, 9))
-        .join('')
+    const suffix = Array.from({ length: 8 }, () => natural(0, 9)).join('')
     return prefix + suffix
 }
 

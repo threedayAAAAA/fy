@@ -1,4 +1,4 @@
-import { parseIntDefault, isKeyof, again, MockDateClass, formatDate } from '@/utils/index'
+import { parseIntDefault, isOwnKeyof, again, MockDateClass, formatDate } from '@/utils/index'
 
 describe('utils', () => {
     describe('parseIntDefault', () => {
@@ -9,6 +9,7 @@ describe('utils', () => {
         })
 
         it('应该返回默认值，如果字符串为 undefined 或 null', () => {
+            //@ts-ignore
             expect(parseIntDefault(undefined, 123)).toBe(123)
             //@ts-ignore
             expect(parseIntDefault(null, 456)).toBe(456)
@@ -35,66 +36,66 @@ describe('utils', () => {
         })
     })
 
-    describe('isKeyof', () => {
+    describe('isOwnKeyof', () => {
         it("应该返回 true，因为 'foo' 是对象 {foo: 1, bar: 2} 的键", () => {
             const obj = { foo: 1, bar: 2 }
-            expect(isKeyof(obj, 'foo')).toBe(true)
+            expect(isOwnKeyof(obj, 'foo')).toBe(true)
         })
 
         it("应该返回 false，因为 'baz' 不是对象 {foo: 1, bar: 2} 的键", () => {
             const obj = { foo: 1, bar: 2 }
-            expect(isKeyof(obj, 'baz')).toBe(false)
+            expect(isOwnKeyof(obj, 'baz')).toBe(false)
         })
 
         it("应该返回 true，因为 'length' 是数组 [1, 2, 3] 的键", () => {
             const arr = [1, 2, 3]
-            expect(isKeyof(arr, 'length')).toBe(true)
+            expect(isOwnKeyof(arr, 'length')).toBe(true)
         })
 
         it("应该返回 false，因为 'foo' 不是数字 123 的键", () => {
             const num = 123
             //@ts-ignore
-            expect(isKeyof(num, 'foo')).toBe(false)
+            expect(isOwnKeyof(num, 'foo')).toBe(false)
         })
 
         it('应该报错，因为传入的对象为 null', () => {
             const obj = null
             //@ts-ignore
-            expect(() => isKeyof(obj, 'foo')).toThrowError()
+            expect(() => isOwnKeyof(obj, 'foo')).toThrowError()
         })
 
         it('应该报错，因为传入的对象为 undefined', () => {
             const obj = undefined
             //@ts-ignore
-            expect(() => isKeyof(obj, 'foo')).toThrowError()
+            expect(() => isOwnKeyof(obj, 'foo')).toThrowError()
         })
 
         it('应该返回 false，因为传入的键为 null', () => {
             const obj = { foo: 1, bar: 2 }
             const key = null
             //@ts-ignore
-            expect(isKeyof(obj, key)).toBe(false)
+            expect(isOwnKeyof(obj, key)).toBe(false)
         })
 
         it('应该返回 false，因为传入的键为 undefined', () => {
             const obj = { foo: 1, bar: 2 }
             const key = undefined
             //@ts-ignore
-            expect(isKeyof(obj, key)).toBe(false)
+            expect(isOwnKeyof(obj, key)).toBe(false)
         })
 
         it('应该返回 false，因为传入的键为数字', () => {
             const obj = { foo: 1, bar: 2 }
             const key = 123
             //@ts-ignore
-            expect(isKeyof(obj, key)).toBe(false)
+            expect(isOwnKeyof(obj, key)).toBe(false)
         })
 
         it('应该返回 false，因为传入的键为布尔值', () => {
             const obj = { foo: 1, bar: 2 }
             const key = true
             //@ts-ignore
-            expect(isKeyof(obj, key)).toBe(false)
+            expect(isOwnKeyof(obj, key)).toBe(false)
         })
     })
 

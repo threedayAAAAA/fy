@@ -2,7 +2,7 @@ import { text, phone, ID, character } from '@/base/text'
 import { textPools } from '@/const'
 describe('character函数', () => {
     it('应该从指定的文本池中返回一个字符', () => {
-        const result = character('lower')
+        const result = character(textPools.lower)
         expect(typeof result).toBe('string')
         expect(result.length).toBe(1)
         expect(textPools.lower).contain(result)
@@ -13,11 +13,6 @@ describe('character函数', () => {
         expect(typeof result).toBe('string')
         expect(result.length).toBe(1)
         expect(textPools.all).contain(result)
-    })
-
-    it('如果指定的文本池不存在，则应抛出错误', () => {
-        //@ts-ignore
-        expect(() => character('invalid-pool')).toThrow('Invalid pool key: invalid-pool')
     })
 })
 
@@ -35,8 +30,16 @@ describe('string', () => {
     })
 
     it('应该返回一个只包含指定字符集的字符串', () => {
-        const result = text({ poolKey: 'lower' })
+        const result = text({ textPool: textPools.lower })
         expect(result).toMatch(/^[a-z]+$/)
+    })
+
+    it('应该返回一个包含自定义字符集的字符串', () => {
+        const result = text({ textPool: '123abc' })
+        expect(result).toMatch(/^[123abc]+$/)
+    })
+    it('给个空池子，应当报错', () => {
+        expect(() => text({ textPool: '' })).throw('textPool应该为长度大于一的字符串')
     })
 
     it('应该返回一个空字符串', () => {

@@ -1,5 +1,5 @@
 import { DateFunc } from '@/type'
-import { MockDateClass } from '@/utils'
+import { MockDateClass, validMoreThan } from '@/utils'
 import { intNum } from './number'
 
 /**
@@ -9,6 +9,7 @@ import { intNum } from './number'
  * @returns {MockDateClass} - 返回一个 MockDateClass 实例，该实例包含一个随机日期
  */
 export const randomDate = (min: Date = new Date(0), max: Date = new Date()): MockDateClass => {
+    validMoreThan('intNum min应该比max小', min.getTime(), max.getTime())
     return new MockDateClass(intNum(min.getTime(), max.getTime()))
 }
 
