@@ -196,9 +196,13 @@ describe('mockData', () => {
             expect(result).toEqual([])
         })
 
-        it('如果提供的长度为2000，则返回2000长度的数组', () => {
-            const result = mockData.array(2000)
-            expect(result.length).equal(2000)
+        it('如果提供的长度为1000，则返回1000长度的数组，时间在20ms内', () => {
+            const before = new Date().getTime()
+            const result = mockData.array(1000, mockData.time)
+            const after = new Date().getTime()
+
+            expect(result.length).equal(1000)
+            expect(after - before).lessThanOrEqual(20)
         })
     })
 

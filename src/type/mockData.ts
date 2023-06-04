@@ -42,8 +42,8 @@ export interface MockData {
     date(min: Date, max: Date): MockDateClass
 
     /**
-     * 生成当前时间的字符串表示
-     * @returns {string} 当前时间的字符串表示
+     * 生成 yyyy-MM-dd HH:mm:ss 格式的随机日期时间字符串的函数
+     * @returns {string} - 返回一个 yyyy-MM-dd HH:mm:ss 格式的随机日期时间字符串
      */
     time(): string
 
