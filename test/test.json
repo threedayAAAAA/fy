@@ -1,0 +1,55 @@
+{
+  "id": {
+    "type": "string"
+  },
+  "name": {
+    "type": "string",
+    "len": 6
+  },
+  "userObject": {
+    "type": "object",
+    "properties": {
+      "id": {"type": "number", "min": 1000, "max": 9999},
+      "name":  {
+        "type": "string",
+        "len": 2
+      },
+      "email": {
+        "type": "email"
+      },
+      "idCard": {
+        "type": "idCard"
+      },
+      "phone": {
+        "type": "phone"
+      },
+      "isUse": {
+        "type": "boolean"
+      }
+    }
+  },
+  "enumDst": {
+    "type": "enum",
+    "enum": ["SRC", "DST", "DNS", "URL"]
+  },
+  "stringArray": {
+    "type": "array",
+    "len": 10
+  },
+  "objectArray": {
+    "type": "array",
+    "len": 10,
+    "item": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "name": {
+          "type": "string",
+          "len": 6
+        }
+      }
+    }
+  }
+}
