@@ -1,21 +1,26 @@
 import { MaybeNumber } from '@/type'
 import { isFunction, isNil } from 'lodash'
 
+const validateSafeNum = (res: number) =>
+    !isNaN(res) && res > Number.MIN_SAFE_INTEGER && res < Number.MAX_SAFE_INTEGER
+
+export const validMoreThan = (errorString: string, min?: MaybeNumber, max?: MaybeNumber) => {
+    const minNum = parseIntDefault(min)
+    const maxNum = parseIntDefault(max)
+    if (minNum > maxNum) throw new Error(errorString)
+}
 /**
  * 将字符串转换为整数，如果转换失败则返回默认值
- * @param {MaybeNumber} [str] 要转换的字符串
- * @param {number} [defaultNum=0] 转换失败时的默认值
+ * @param {MaybeNumber| undefined} [str] 要转换的字符串
+ * @param {number} [defaultNum = 0] 转换失败时的默认值
  * @returns {number} 转换后的整数
  */
-export const parseIntDefault = (str?: MaybeNumber, defaultNum: number = 0) => {
+export const parseIntDefault = (str: MaybeNumber | undefined, defaultNum = 0) => {
     if (isNil(str)) return defaultNum
 
     const result = parseInt(str.toString(), 10)
 
-    const judge = (res: number) =>
-        !isNaN(res) && res > Number.MIN_SAFE_INTEGER && res < Number.MAX_SAFE_INTEGER
-
-    return judge(result) ? result : defaultNum
+    return validateSafeNum(result) ? result : defaultNum
 }
 
 /**
@@ -25,7 +30,7 @@ export const parseIntDefault = (str?: MaybeNumber, defaultNum: number = 0) => {
  * @param {T} key 要判断的属性名
  * @returns {key is keyof typeof obj} 如果是属性名则返回 true，否则返回 false
  */
-export const isKeyof = <T extends string>(obj: object, key: T): key is keyof typeof obj =>
+export const isOwnKeyof = <T extends string>(obj: object, key: T): key is keyof typeof obj =>
     Object.getOwnPropertyNames(obj).includes(key)
 
 /**
@@ -117,7 +122,7 @@ export const formatDate = (date: Date, formatString: string) => {
             const operate = formatPatter[p]
             return isFunction(operate)
                 ? operate(date).toString()
-                : isKeyof(formatPatter, operate)
+                : isOwnKeyof(formatPatter, operate)
                 ? pattern($0, operate)
                 : date[operate as Exclude<typeof operate, 'yy' | 'yyyy' | 'dd' | 'SS'>]().toString()
         },

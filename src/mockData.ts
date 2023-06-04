@@ -1,10 +1,11 @@
-import { MockData, PoolKeys, GeneratorArray, MockObject, MockArray } from '@/type'
+import { MockData, Generate, MockObject, MockArray } from '@/type'
 import { isFunction, isNil, isObject, isString, isUndefined, sample } from 'lodash'
 import { mockNumber, mockText, mockBoolean, mockDate } from './base'
 import { MockDateClass } from './utils'
+import { textPools } from './const'
 
 export class Mock implements MockData {
-    private templateMap: Record<string, (() => any) | string> = {
+    private templateMap: Record<string, Generate<any>> = {
         ...mockText,
         ...mockNumber,
         ...mockBoolean,
@@ -27,22 +28,22 @@ export class Mock implements MockData {
         }
     }
 
-    string(length: number = 10, poolKey: PoolKeys = 'alpha'): string {
+    string(length: number = 10, textPool = textPools.alpha): string {
         return mockText.text({
             min: length,
             max: length,
-            poolKey,
+            textPool,
         })
     }
 
-    number(min?: number, max?: number): number {
+    number(min?: number, max?: number, toFixed = 0): number {
         if (isString(min) || isString(max)) {
-            throw new TypeError('min和max应该是字符串')
+            throw new TypeError('min和max应该是数字')
         }
         if (!isUndefined(min) && !isUndefined(max) && min > max) {
             throw new RangeError('max < min')
         }
-        return mockNumber.intNum(min, max) as number
+        return mockNumber.floatNum(min, max, toFixed)
     }
 
     boolean(): boolean {
@@ -59,10 +60,25 @@ export class Mock implements MockData {
 
     array<T = string>(
         length: number = mockNumber.intNum(3, 7),
-        ...generators: GeneratorArray<T>
-    ): T[] {
+        ...generators: Generate<T>[]
+    ): Array<T | string> {
         generators.length === 0 && generators.push(mockText.text as () => T)
-        return Array.from({ length }).map(() => sample(generators)!())
+        return Array.from({ length }).map(() => {
+            const func = sample(generators)!
+            return isFunction(func) ? func() : func
+        })
+    }
+
+    private templateUnknown(value: unknown) {
+        if (typeof value === 'string') {
+            return this.template(value)
+        } else if (Array.isArray(value)) {
+            return this.templateArray(value)
+        } else if (isObject(value)) {
+            return this.templateObject(value)
+        } else {
+            return value
+        }
     }
 
     template(template: string): string {
@@ -73,36 +89,18 @@ export class Mock implements MockData {
     }
 
     templateArray(template: MockArray): MockArray {
-        return template.map(value => {
-            if (typeof value === 'string') {
-                return this.template(value)
-            } else if (Array.isArray(value)) {
-                return this.templateArray(value)
-            } else if (isObject(value)) {
-                return this.templateObject(value)
-            } else {
-                throw new Error(`${value} 类型不支持,支持string,array,object类型`)
-            }
-        })
+        return template.map(value => this.templateUnknown(value))
     }
 
     templateObject(template: MockObject): MockObject {
         if (isNil(template)) return template
         return Object.entries(template).reduce((pre, [key, value]) => {
-            if (typeof value === 'string') {
-                pre[this.template(key)] = this.template(value)
-            } else if (Array.isArray(value)) {
-                pre[this.template(key)] = this.templateArray(value)
-            } else if (isObject(value)) {
-                pre[this.template(key)] = this.templateObject(value)
-            } else {
-                pre[this.template(key)] = value
-            }
+            pre[this.template(key)] = this.templateUnknown(value)
             return pre
         }, {} as MockObject)
     }
 
-    define<T>(name: string, generator: (() => T) | string): void {
+    define<T = any>(name: string, generator: Generate<T>): void {
         this.templateMap[name] = generator
     }
 }

@@ -1,7 +1,7 @@
 import { isUndefined, random } from 'lodash'
 import { safeMaxNum } from '../const'
 import { MaybeNumber } from '../type'
-import { parseIntDefault } from '../utils'
+import { parseIntDefault, validMoreThan } from '../utils'
 
 /**
  * 生成指定范围内的整数
@@ -10,6 +10,8 @@ import { parseIntDefault } from '../utils'
  * @returns {number} 生成的整数
  */
 export const intNum = (min?: MaybeNumber, max?: MaybeNumber) => {
+    validMoreThan('intNum min应该比max小', min, max)
+
     const minNum = parseIntDefault(min, -safeMaxNum)
     const maxNum = parseIntDefault(max, safeMaxNum)
     return random(minNum, maxNum, false)
@@ -22,6 +24,8 @@ export const intNum = (min?: MaybeNumber, max?: MaybeNumber) => {
  * @returns {number} 生成的自然数
  */
 export const natural = (min?: MaybeNumber, max?: MaybeNumber) => {
+    validMoreThan('natural min应该比max小', min, max)
+
     let minNum = parseIntDefault(min)
     minNum = minNum > 0 ? minNum : 0
     let maxNum = parseIntDefault(max, safeMaxNum)
@@ -37,16 +41,14 @@ export const natural = (min?: MaybeNumber, max?: MaybeNumber) => {
  * @returns {number} 生成的浮点数
  */
 export const floatNum = (min?: MaybeNumber, max?: MaybeNumber, fixed?: number) => {
+    validMoreThan('floatNum min应该比max小', min, max)
+
     const minNum = parseIntDefault(min, -safeMaxNum)
     const maxNum = parseIntDefault(max, safeMaxNum)
     let result = random(minNum, maxNum, true)
     if (!result.toString().includes('.')) {
         result = (result % 10) + 0.5
     }
-    if (isUndefined(fixed)) {
-        return result
-    } else {
-        result = parseFloat(result.toFixed(fixed))
-        return result
-    }
+
+    return isUndefined(fixed) ? result : parseFloat(result.toFixed(fixed))
 }

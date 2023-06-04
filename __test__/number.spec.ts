@@ -13,6 +13,9 @@ describe('number', () => {
             expect(result).toBeGreaterThanOrEqual(-9007199254740991)
             expect(result).toBeLessThanOrEqual(9007199254740991)
         })
+        it('应该报错，因为传入min>max', () => {
+            expect(() => intNum(2, 1)).throw('min应该比max小')
+        })
     })
 
     describe('natural', () => {
@@ -32,6 +35,9 @@ describe('number', () => {
             const result = natural(-1, 0)
             expect(result).toBe(0)
         })
+        it('应该报错，因为传入min>max', () => {
+            expect(() => natural(2, 1)).throw('min应该比max小')
+        })
     })
 
     describe('float', () => {
@@ -47,6 +53,10 @@ describe('number', () => {
             expect(result).toBeGreaterThanOrEqual(-9007199254740991)
             expect(result).toBeLessThanOrEqual(9007199254740991)
             expect(result.toString()).contain('.')
+        })
+
+        it('应该报错，因为传入min>max', () => {
+            expect(() => floatNum(2, 1)).throw('min应该比max小')
         })
     })
 })

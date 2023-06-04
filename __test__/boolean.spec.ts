@@ -19,7 +19,6 @@ describe('randomBool', () => {
         const min = 1
         const max = 0
         const result = Array.from({ length: 1000 }, () => randomBool(current, min, max))
-
         expect(result).not.contain(current)
     })
 
