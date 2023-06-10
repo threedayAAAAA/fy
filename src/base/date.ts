@@ -17,8 +17,11 @@ export function mockTimestamp(options?: DateOptions): number {
     }
     const mergedOptions = { ...defaultOptions, ...options }
     // 获取最小和最大日期的时间戳
-    const minTimestamp = mergedOptions.min.getTime()
-    const maxTimestamp = mergedOptions.max.getTime()
+    const minTimestamp = mergedOptions.min!.getTime()
+    const maxTimestamp = mergedOptions.max!.getTime()
+    if (minTimestamp > maxTimestamp) {
+      throw new Error('最小日期不能大于最大日期')
+    }
     // 返回一个在最小和最大时间戳之间的随机时间戳
     return Math.floor(Math.random() * (maxTimestamp - minTimestamp + 1)) + minTimestamp
 }
@@ -31,9 +34,14 @@ export function mockDate(options?: StringOptions): string {
         max: new Date(),
     }
     const mergedOptions = { ...defaultOptions, ...options }
+    const minTimestamp = mergedOptions.min!.getTime()
+    const maxTimestamp = mergedOptions.max!.getTime()
+    if (minTimestamp > maxTimestamp) {
+      throw new Error('最小日期不能大于最大日期')
+    }
     // 获取一个随机时间戳
     const timestamp = mockTimestamp(mergedOptions)
-    return format(timestamp, mergedOptions.format)
+    return format(timestamp, mergedOptions.format!)
 }
 
 // 返回一个随机时间字符串

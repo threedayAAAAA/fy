@@ -1,5 +1,7 @@
+// 自定义方法内置两个： 随机生成身份证号码，随机生成手机号码
+
 // 随机生成身份证号码
-export function mockIdCardNumber() {
+export function mockIdCardNumber(): string {
     const provinceCode = Math.floor(Math.random() * 1000 + 110000).toString()
     const birthDate = new Date(
         Math.floor(Math.random() * (new Date().getTime() - new Date(1900, 0, 1).getTime())) +
