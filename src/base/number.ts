@@ -8,7 +8,7 @@ interface OptionsType {
 export const mockInt = (options?: OptionsType): number => {
     const { min = 0, max = 100 } = options || {}
 
-    if (min >= max) {
+    if (min > max) {
         throw new Error('max必须大于min')
     }
 
@@ -19,7 +19,7 @@ export const mockInt = (options?: OptionsType): number => {
 export const mockFloat = (options?: OptionsType): number => {
     const { min = 0, max = 100, decimalPlaces = 2 } = options || {}
 
-    if (min >= max) {
+    if (min > max) {
         throw new Error('max必须大于min')
     }
 
@@ -39,7 +39,7 @@ export const mockNatural = (options?: OptionsType): number => {
     throw new Error('min和max必须大于等于0')
   }
 
-  if (min >= max) {
+  if (min > max) {
     throw new Error('max必须大于min')
   }
 

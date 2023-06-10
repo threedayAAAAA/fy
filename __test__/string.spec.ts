@@ -29,4 +29,14 @@ describe('测试 mockString函数', () => {
         const result = mockString({ chars: '' })
         expect(result).toBe('')
     })
+
+    it('应该返回长度为0的随机字符串', () => {
+      const result = mockString({ length: 0, chars: 'abc' })
+      expect(result).toBe('')
+    })
+    
+    it('应该返回长度为1的随机字符串', () => {
+        const result = mockString({ length: 1, chars: 'abc' })
+        expect(result).toMatch(/[abc]/)
+    })
 })
