@@ -1,33 +1,25 @@
 @startuml
+class DataGenerator {
+  - mockGen: MockGenerator
+  + registerMockGen(mockFuncs: Record<string, Fn>): void
+  + generateData(template: unknown, key: VKey = ''): unknown
+  - genObject(template: Record<VKey, unknown>, rule: KeyRule): Record<VKey, unknown>
+  - genArray(template: unknown[], rule: KeyRule): unknown[]
+  - genNumber(template: number, rule: KeyRule): number
+  - getPlaceholders(str: string): string[]
+  - replacePlaceholders(beforeParseStr: string, placeholders: string[]): any
+  - parsePlaceholder(placeholderStr: string): any
+  - genString(template: string, rule: KeyRule): string
+  - genBoolean(template: boolean, rule: KeyRule): boolean
+}
+
 class MockGenerator {
-  + string(poolStr: string): string
-  + string(poolStr: string, min: number): string
-  + string(min: number, max: number): string
-  + string(poolStr: strin, min: number, max: number): string
-  + character(poolStr: string): string
-  + integer(min: number, max: number): number
-  + natural(min: number, max: number): number
-  + float(min: number, max: number): number
-  + boolean(min: number, max: number): number
-  + timestamp(start: Date | number | string, end: Date | number | string): number
-  + date(farmat: string, start: Date | number | string, end: Date | number | string): string
-  + customMockGen(mockFuncs: Record<string, Fn>): void
+  - mockFnMap: typeof BaseMockFnMap & { [key: string]: Fn }
+  + registerMockGen(mockFuncs: Record<string, Fn>): void
+  + getHandler(key: string): Fn | undefined
+  - isBuiltInMockGen(key: string): boolean
 }
 
-class CodeGenerator {
-  + generateData(template: any, key?: string | number): any
-  + genObject(template: object, rule: keyRule): object
-  + genArray(template: any[], rule: keyRule): any[]
-  + genString(template: string, rule: keyRule): any
-  + genNumber(template: number, rule: keyRule): number
-  + genBoolean(template: boolean, rule: keyRule): number
-}
-
-class TemplateParse {
-  + parseKey(key?: string): keyRule
-  + parsePlaceholder(placeholder: string): any
-}
-
-CodeGenerator --> TemplateParse
-TemplateParse --> MockGenerator
+DataGenerator -> MockGenerator
+MockGenerator -> BaseMockFnMap
 @enduml

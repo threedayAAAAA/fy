@@ -1,108 +1,69 @@
-import { parserKey, parsePlaceholder, parseArgs } from '../../src/templateParser/index';
+import { parserKey, parseArgs } from '../../src/templateParser/index';
 import { it, expect, describe } from 'vitest';
-import mockGenerator from '../../src/mockGenerator/index';
 
 describe('parserKey', () => {
-  it('应该返回正确的 KeyRule 对象', () => {
-    const key1 = 'foo|1-10';
-    const key2 = 'bar|5';
-    const key3 = 'baz';
-    const key4 = undefined;
-
-    const result1 = parserKey(key1);
-    const result2 = parserKey(key2);
-    const result3 = parserKey(key3);
-    const result4 = parserKey(key4);
-
-    expect(result1).toEqual({
+  it('应该正确解析键名', () => {
+    const key = 'foo|1-3';
+    const expected = {
       keyName: 'foo',
       count: expect.any(Number),
       min: 1,
-      max: 10,
-    });
-    expect(result2).toEqual({
+      max: 3,
+    };
+    const result = parserKey(key);
+    expect(result).toEqual(expected);
+  });
+
+  it('应该正确处理没有范围的键名', () => {
+    const key = 'bar';
+    const expected = {
       keyName: 'bar',
-      count: 5,
-      min: 5,
-      max: undefined,
-    });
-    expect(result3).toEqual({
+    };
+    const result = parserKey(key);
+    expect(result).toEqual(expected);
+  });
+
+  it('应该正确处理没有计数的键名', () => {
+    const key = 'baz|10-';
+    const expected = {
+      count: 10,
       keyName: 'baz',
-      count: undefined,
-      min: undefined,
+      min: 10,
       max: undefined,
-    });
-    expect(result4).toEqual({
-      keyName: '',
-      count: undefined,
-      min: undefined,
-      max: undefined,
-    });
+    };
+    const result = parserKey(key);
+
+    expect(result).toEqual(expected);
   });
 
-  it('应该正确处理边界情况', () => {
-    const key1 = '';
-    const key2 = 'foo|bar|baz';
-    const key3 = 'foo|1-';
-    const key4 = 'foo|-10';
-
-    const result1 = parserKey(key1);
-    const result2 = parserKey(key2);
-    const result3 = parserKey(key3);
-    const result4 = parserKey(key4);
-
-    expect(result1).toEqual({
-      keyName: '',
-      count: undefined,
-      min: undefined,
-      max: undefined,
-    });
-    expect(result2).toEqual({
-      keyName: 'foo|bar|baz',
-      count: undefined,
-      min: undefined,
-      max: undefined,
-    });
-    expect(result3).toEqual({
-      keyName: 'foo',
-      count: 1,
-      min: 1,
-      max: undefined,
-    });
-    expect(result4).toEqual({
-      keyName: 'foo',
-      count: -10,
-      min: -10,
-      max: undefined,
-    });
-  });
-});
-
-describe('parsePlaceholder', () => {
-  it('应该正确解析占位符并返回对应的值', () => {
-    const result = parsePlaceholder('@string');
-    expect(typeof result).toBe('string');
-    expect(result.length).toBeGreaterThanOrEqual(0);
-    expect(result.length).toBeLessThanOrEqual(100);
+  it('应该正确处理计数为0的键名', () => {
+    const key = 'qux|0-0';
+    const expected = {
+      keyName: 'qux',
+      count: 0,
+      min: 0,
+      max: 0,
+    };
+    const result = parserKey(key);
+    expect(result).toEqual(expected);
   });
 
-  it('应该正确解析带参数的占位符并返回对应的值', () => {
-    const result = parsePlaceholder('@integer(1, 10)');
-    expect(result).toBeGreaterThan(0);
-    expect(result).toBeLessThan(11);
+  it('应该正确处理无效的键名', () => {
+    const key = null;
+    const expected = {
+      keyName: null,
+    };
+    const result = parserKey(key);
+    expect(result).toEqual(expected);
   });
 
-  it('应该正确处理无效的占位符并返回原始字符串', () => {
-    const result = parsePlaceholder('@invalid');
-    expect(result).toBe('@invalid');
-  });
-
-  it('应该正常处理新增自定义mock, 非方法的情况', () => {
-    mockGenerator.customMockGen({
-      test: '1',
-    });
-    const result = parsePlaceholder('@test');
-    expect(result).toBe('');
+  it('应该正确处理无效的规则', () => {
+    const key = 'qux|dfsa';
+    const expected = {
+      keyName: key,
+    };
+    const result = parserKey(key);
+    expect(result).toEqual(expected);
   });
 });
 

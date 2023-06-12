@@ -4,8 +4,12 @@ import { POSITION } from './const';
 /** 默认的概率 */
 const DEFAULT_PROBABILITY = 50;
 
-export function boolean(probability: number = DEFAULT_PROBABILITY) {
-  probability = parseFloat(probability.toString());
+/**
+ * 随机生成布尔值
+ * @param probability 生成true的概率
+ * @returns 随机生成的布尔值
+ */
+export function randomBool(probability: number = DEFAULT_PROBABILITY) {
   if (isNaN(probability)) {
     Logger.warn(POSITION, 'probability must be a number, now use default (50)');
     probability = DEFAULT_PROBABILITY;
@@ -20,5 +24,5 @@ export function boolean(probability: number = DEFAULT_PROBABILITY) {
 }
 
 export default {
-  boolean,
+  bool: randomBool,
 };
