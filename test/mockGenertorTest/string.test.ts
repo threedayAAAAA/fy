@@ -1,5 +1,5 @@
 import { it, expect, describe } from 'vitest';
-import { character, string } from '../../src/mockGenerator/string';
+import { character, randomStr } from '../../src/mockGenerator/string';
 
 describe('character函数', () => {
   it('应该从默认字符池中返回一个字符', () => {
@@ -37,48 +37,49 @@ describe('character函数', () => {
 
 describe('string', () => {
   it('应该返回一个长度在0到100之间的随机字符串，当没有传入参数时', () => {
-    const result = string();
+    const result = randomStr();
     expect(result.length).toBeGreaterThanOrEqual(0);
     expect(result.length).toBeLessThanOrEqual(100);
   });
 
   it('应该返回一个长度在0到100之间的字符池内的随机字符串，当只传入poolStr参数为字符串时', () => {
-    const result = string('abc');
+    const result = randomStr('abc');
     expect(result).toMatch(/[abc]/);
     expect(result.length).toBeGreaterThanOrEqual(0);
     expect(result.length).toBeLessThanOrEqual(100);
   });
 
   it('应该返回一个指定长度的随机字符串，当只传入poolStr参数为数字时', () => {
-    const result = string(5);
+    const result = randomStr(5);
     expect(result.length).equal(5);
   });
 
   it('应该返回一个长度为min的最小值的随机字符串，当传入poolStr和min参数时，且poolStr为字符串', () => {
-    const result = string('abc', 2);
+    const result = randomStr('abc', 2);
+    expect(result).toMatch(/[abc]/);
     expect(result.length).toBe(2);
   });
 
   it('应该返回一个长度为poolStr和min的最小值之间的随机字符串，当传入poolStr和min参数时，且poolStr为数字', () => {
-    const result = string(3, 2);
+    const result = randomStr(3, 2);
     expect(result.length).toBeGreaterThanOrEqual(2);
     expect(result.length).toBeLessThanOrEqual(3);
   });
 
   it('应该返回一个长度在min和max之间的随机字符串，当传入poolStr、min和max参数时，且poolStr为字符串', () => {
-    const result = string('abc', 2, 4);
+    const result = randomStr('abc', 2, 4);
     expect(result.length).toBeGreaterThanOrEqual(2);
     expect(result.length).toBeLessThanOrEqual(4);
   });
 
   it('应该返回一个长度在min和max之间的随机字符串，当传入poolStr、min和max参数时，且poolStr为数字', () => {
-    const result = string(3, 2, 4);
+    const result = randomStr(3, 2, 4);
     expect(result.length).toBeGreaterThanOrEqual(2);
     expect(result.length).toBeLessThanOrEqual(4);
   });
 
   it('应该返回一个长度在min和max之间的随机字符串，当传入poolStr、min和max参数时，且poolStr不为字符串', () => {
-    const result = string(3, 2, 4);
+    const result = randomStr(3, 2, 4);
     expect(result.length).toBeGreaterThanOrEqual(2);
     expect(result.length).toBeLessThanOrEqual(4);
   });

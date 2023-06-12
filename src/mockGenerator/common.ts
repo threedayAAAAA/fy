@@ -1,7 +1,7 @@
-import { date } from './date';
+import { randomDate } from './date';
 import { natural } from './number';
 
-export const PRE_DIXS = [
+const PRE_DIXS = [
   '130',
   '131',
   '132',
@@ -33,7 +33,7 @@ const CHECK_CODE = '0123456789X';
  * 随机生成手机号码
  * @returns 随机生成的手机号码
  */
-export function phoneNumber() {
+export function randomPhoneNumber() {
   const randomPrefix = PRE_DIXS[Math.floor(Math.random() * PRE_DIXS.length)];
   const randomNumber = Math.floor(Math.random() * 100000000)
     .toString()
@@ -41,9 +41,9 @@ export function phoneNumber() {
   return `${randomPrefix}${randomNumber}`;
 }
 
-export function cid() {
+export function randomCid() {
   const randomProvinceCode = natural(100000, 999999);
-  const randomBirthDate = date('YYYYMMDD');
+  const randomBirthDate = randomDate('YYYYMMDD');
   const randomSequenceCode = natural(0, 100).toString().padStart(3, '0');
   const idNumberWithoutCheckCode = `${randomProvinceCode}${randomBirthDate}${randomSequenceCode}`;
   const checkCode = CHECK_CODE.charAt(natural(0, CHECK_CODE.length - 1));
@@ -51,6 +51,6 @@ export function cid() {
 }
 
 export default {
-  phoneNumber,
-  cid,
+  pNumber: randomPhoneNumber,
+  cid: randomCid,
 };

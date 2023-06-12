@@ -1,7 +1,9 @@
+import type { VKey } from 'src/types';
+
 /** 解析完key后返回的值的生成规则 */
 export interface KeyRule {
   /** 键名 */
-  keyName: string;
+  keyName?: VKey;
   /** 确切的生成数，'name|1' */
   count?: number;
   /** 最小值，主要用于随机数值 */

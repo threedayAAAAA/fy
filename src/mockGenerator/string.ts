@@ -1,21 +1,57 @@
-import { isString, isUndefined } from 'lodash-es';
-import { Logger } from '../util/logger';
-import { DEFAULT_POOL, POSITION } from './const';
+import { isNumber, isString } from 'lodash-es';
+import { DEFAULT_POOL } from './const';
 import { natural } from './number';
-
-function getMin(min = 0) {
-  let poolToMin = parseInt(min.toString(), 10);
-  return isNaN(poolToMin) ? natural(0, 100) : poolToMin;
-}
-
 /**
  * 从指定的字符池中随机返回一个字符。
  * @param pool 字符池。
  * @returns 返回一个随机字符。
  */
-export function character(poolStr: string = '') {
+export function character(poolStr = '') {
   poolStr = poolStr || DEFAULT_POOL;
   return poolStr.charAt(natural(0, poolStr.length - 1));
+}
+
+interface RandomStrOptType {
+  poolStr: string;
+  strLen: number;
+}
+
+/** 默认字符串生成的最小长度 */
+const DEFAULT_MIN = 0;
+
+/** 默认字符串生成的最大长度 */
+const DEFAULT_MAX = 100;
+
+function getCharPool(poolStrOrLength: string | number) {
+  return isString(poolStrOrLength) ? poolStrOrLength : DEFAULT_POOL;
+}
+
+function getLength(poolStrOrLength: string | number, min: number, max: number) {
+  const length = isNumber(poolStrOrLength) ? poolStrOrLength : natural(min, max);
+  return Math.max(length, 0);
+}
+
+function getRandomStrOpt(
+  poolStrOrLength: string | number = DEFAULT_POOL,
+  min = DEFAULT_MIN,
+  max?: number,
+): RandomStrOptType {
+  // 匹配randomStr('test', 3)的情况，表示在test中随机抽取三个，所以最大值等于最小值
+  if (isString(poolStrOrLength) && isNumber(min) && !isNumber(max)) {
+    max = min || DEFAULT_MAX;
+  }
+  return {
+    poolStr: getCharPool(poolStrOrLength),
+    strLen: getLength(poolStrOrLength, min, max || DEFAULT_MAX),
+  };
+}
+
+function simpleRandomStr(poolStr: string, length: number) {
+  let str = '';
+  for (let i = 0; i < length; i++) {
+    str += character(poolStr);
+  }
+  return str;
 }
 
 /**
@@ -25,41 +61,12 @@ export function character(poolStr: string = '') {
  * @param max
  * @returns
  */
-export function string(poolStr?: string | number, min?: number, max?: number): string {
-  let strLen = 0;
-  let str = '';
-  if (isUndefined(poolStr) && isUndefined(min) && isUndefined(max)) {
-    strLen = natural(0, 100);
-  } else if (!isUndefined(poolStr) && isUndefined(min) && isUndefined(max)) {
-    if (isString(poolStr)) {
-      strLen = natural(0, 100);
-    } else {
-      strLen = getMin(poolStr);
-      poolStr = undefined;
-    }
-  } else if (!isUndefined(poolStr) && !isUndefined(min) && isUndefined(max)) {
-    if (isString(poolStr)) {
-      strLen = getMin(min);
-    } else {
-      strLen = natural(poolStr, min);
-      poolStr = undefined;
-    }
-  } else if (!isUndefined(poolStr) && !isUndefined(min) && !isUndefined(max)) {
-    strLen = natural(min, max);
-    if (typeof poolStr !== 'string') {
-      Logger.warn(POSITION, `string pool be a string,but got ${typeof poolStr}`);
-    }
-    poolStr = poolStr.toString();
-  }
-
-  for (let i = 0; i < strLen; i++) {
-    str += character(poolStr as string);
-  }
-
-  return str;
+export function randomStr(poolStrOrLength?: string | number, min?: number, max?: number): string {
+  const { poolStr, strLen } = getRandomStrOpt(poolStrOrLength, min, max);
+  return simpleRandomStr(poolStr, strLen);
 }
 
 export default {
   character,
-  string,
+  string: randomStr,
 };
