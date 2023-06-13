@@ -1,7 +1,7 @@
 import { MockData, Generate, MockObject, MockArray } from '@/type'
 import { isFunction, isNil, isObject, isString, isUndefined, sample } from 'lodash'
 import { mockNumber, mockText, mockBoolean, mockDate } from './base'
-import { MockDateClass } from './utils'
+import { MockDateClass, isOwnKeyof } from './utils'
 import { textPools } from './const'
 
 export class Mock implements MockData {
@@ -19,7 +19,10 @@ export class Mock implements MockData {
 
     private get formatPatterRegex() {
         //转化成 匹配 /@(aFunc|bFunc)/
-        return new RegExp(`@(${Object.keys(this.templateMap).join('|')})`, 'g')
+        return new RegExp(
+            `@(${Object.keys(this.templateMap).join('|')})(?:\|\w+(?:-\w+)?)?(?:\|\w+)?`,
+            'g',
+        )
     }
 
     constructor(templateMap?: Record<string, () => any | string>) {
@@ -81,11 +84,21 @@ export class Mock implements MockData {
         }
     }
 
-    template(template: string): string {
-        return template.replace(this.formatPatterRegex, ($0: string, p: string): string => {
-            const func = this.templateMap[p] as Function | string
-            return isFunction(func) ? func().toString() : func
-        })
+    template(template: string): any {
+        //单个key特殊处理
+        const maybeKey = template.split('@')[1]
+        if (isOwnKeyof(this.templateMap, maybeKey)) {
+            const func = this.templateMap[maybeKey] as Function | string
+            return isFunction(func) ? func() : func
+        }
+
+        return template.replace(
+            this.formatPatterRegex,
+            ($0: string, p: string, ...params): string => {
+                const func = this.templateMap[p] as Function | string
+                return isFunction(func) ? func().toString() : func
+            },
+        )
     }
 
     templateArray(template: MockArray): MockArray {

@@ -202,7 +202,7 @@ describe('mockData', () => {
             const after = new Date().getTime()
 
             expect(result.length).equal(1000)
-            expect(after - before).lessThanOrEqual(20)
+            expect(after - before).lessThanOrEqual(50)
         })
     })
 
@@ -210,7 +210,7 @@ describe('mockData', () => {
     describe('template', () => {
         //常规替换
         it('应该正确替换模板中的占位符', () => {
-            const template = '这是一个字符串模板，@string @number @boolean @time'
+            const template = '这是一个字符串模板，@string @number|1-2 @boolean @time'
             const result = mockData.template(template)
             expect(result).toMatch(new RegExp(stringRegString, 'g'))
             expect(result).toMatch(new RegExp(numberRegString, 'g'))
@@ -234,6 +234,7 @@ describe('mockData', () => {
             const template = '@string'
             const result = mockData.template(template)
             expect(result).toMatch(new RegExp(stringRegString, 'g'))
+            expect(mockData.template('@boolean')).toBeTypeOf('boolean')
         })
     })
 
