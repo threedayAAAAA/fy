@@ -1,4 +1,4 @@
-import { Mocker } from '../mocker/mocker';
+import { Mocker } from '../mocker.js';
 
 /**
  * 常量数值

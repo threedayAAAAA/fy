@@ -1,15 +1,28 @@
-export const date = {
-    time(bt?: string | number | Date, et?: string | number | Date, fmt?: string) {
-        const b = bt ? new Date(bt).getTime() : -28800000,
-            e = et ? new Date(et).getTime() : new Date().getTime(),
-            date = new Date(rand.int(b, e));
+import { Mocker } from '../mocker.js';
+import dayjs from 'dayjs';
 
-        return fmt ? formatDate(date, fmt) : date;
-    },
-    now: (fmt?: string) => fmt ? formatDate(new Date(), fmt) : new Date(),
-    year: () => rand.int(1949, 2020),
-    month: () => rand.int(1, 12),
-    day: () => rand.int(1, 28),
-    hour: () => rand.int(1, 24),
-    minute: () => rand.int(0, 59),
+/**
+ * 随机生成日期
+ * @param start
+ * @param end
+ * @param format
+ * @return {string}
+ */
+export function randomDate(format: string = 'YYYY-MM-DD', start?: string, end?: string): string {
+    const startDate = start ? new Date(start) : new Date(1970, 0, 1); // 起始日期为指定日期或 1970 年 1 月 1 日
+    const endDate = end ? new Date(end) : new Date(); // 结束日期为指定日期或当前日期
+    const startTimestamp = dayjs(startDate).valueOf();
+    const endTimestamp = dayjs(endDate).valueOf();
+
+    if (startTimestamp > endTimestamp) {
+        throw new Error('起始日期不能大于结束日期');
+    }
+    const randomTime = Math.round(Math.random() * (endTimestamp - startTimestamp)) + startTimestamp;;
+    return dayjs(randomTime).format(format);
+}
+
+export function date(format?: string, start?: string, end?: string) {
+  return new Mocker(function () {
+    return randomDate(format, start, end);
+  });
 }

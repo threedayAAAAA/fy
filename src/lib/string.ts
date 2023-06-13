@@ -1,12 +1,14 @@
-import { randomString } from './random';
-import { Mocker } from '../mocker/mocker';
+import { randomString } from './random/index.js';
+import { Mocker } from '../mocker.js';
 
 /**
- * @param len
+ * 生成字符串
+ * @param min
+ * @param max
  * @returns {Mocker}
  */
-export function string(len: number = 8) {
+export function string(min?:number, max?: number) {
   return new Mocker(function () {
-    return randomString(len);
+    return randomString(min, max);
   });
 }
