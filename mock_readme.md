@@ -10,149 +10,147 @@
 
 ##### 1.生成基本数据类型
 
-mockData.randomBase(type: string): string|number|boolean
+可通过调用函数生成，也可通过模板字符串生成
 
 ```ts
-import {MockData} form 'mock';
-
-const mockData = new MockData();
+import randomBase form 'randomBase'
+import Mock from 'mock'
 //生成字符串
-mockData.randomBase('string');
+randomBase.string()
+Mock.mock('@string()')
 //生成整数
-mockData.randomBase('integer');
+randomBase.integer();
+Mock.mock('@integer()')
 //生成自然数
-mockData.randomBase('natural');
+randomBase.natural();
+Mock.mock('@natural()')
 //生成浮点数
-mockData.randomBase('float');
+randomBase.float();
+Mock.mock('@float()')
 //生成布尔值
-mockData.randomBase('boolean');
+randomBase.boolean();
+Mock.mock('@boolean()')
 //生成日期
-mockData.randomBase('date');
-//生成时间
-mockData.randomBase('time');
-//生成null
-mockData.randomBase('null');
-//生成undefined
-mockData.randomBase('undefined');
+randomBase.date();
+Mock.mock('@date()')
+//生成现在的时间
+randomBase.now();
+Mock.mock('@now()')
+//生成时间戳
+randomBase.timestamp();
+Mock.mock('@timestamp()')
 ```
 
 ##### 2.生成自定义（具有特定意义）数据类型
 
-mockData.randomCustom(type: string, config?: Config): string|number
-
 ```ts
-import {MockData} form 'mock';
+import randomBase form 'randomBase'
+import Mock from 'mock'
 
-const mockData = new MockData();
 //生成身份证
-mockData.randomCustom('idCard');
+randomBase.idCard();
+Mock.mock('@idCard()')
 //生成手机号
-mockData.randomCustom('phone');
-//生成指定文字类型的字符串 '生日'
-mockData.randomCustom('string', {type: 'cn'});
-//生成uuid，数据类型为number|string
-mockData.randomCustom('uuid', {type: 'number'});
-//生成邮箱，邮箱类型
-mockData.randomCustom('email', {suffix: 'qq.com'});
-//生成ip，ipv4 ipv6 both
-mockData.randomCustom('ip', {type: 'both'});
-//生成域名
-mockData.randomCustom('domain');
-//生成url
-mockData.randomCustom('url');
-//生成英文姓名en|cn
-mockData.randomCustom('name', {type: 'en'});
-//生成指定正则的数据 'xG5'
-mockData.randomCustom('regexp', {reg: '/[a-z][A-Z][0-9]/'});
+randomBase.phone();
+Mock.mock('@phone()')
+//生成邮箱，邮箱类型，可配置指定后缀，不填写随机生成
+randomBase.email('qq.com');
+Mock.mock('@email()')
+//生成小写英文单词2-4位之间单词
+randomBase.word(2,4);
+//生成小写英文单词4位之间单词
+Mock.mock('@word(4)')
+//生成中文2-4个字
+randomBase.cword(2,4);
+//生成中文4个字
+Mock.mock('@cword(4)')
+//生成枚举值，输入参数中随机选取一个
+randomBase.oneof('1', '2');
+Mock.mock('@oneof(abc,def,hij)')
 ```
 
 ##### 3.生成符合特定规则的数据
 
-mockData.randomSpecial(type: string, config: Config): string|number
-
 ```ts
-import {MockData} form 'mock';
+import randomBase form 'randomBase'
+import Mock from 'mock'
 
 const mockData = new MockData();
-//生成指定长度范围字符串
-mockData.randomSpecial('string', {min: 0, max: 10});
+//生成指定长度范围字符串，生成小写字母，长度在1-10之间 'abc'
+randomBase.string('lower', 1, 10);
+Mock.mock('@string(lower,1,10)')
 //生成指定长度字符串
-mockData.randomSpecial('string', {len: 6});
-//生成指定范围数字
-mockData.randomSpecial('number', {min: 0, max: 10});
-//生成指定格式日期 todo起始
-mockData.randomSpecial('date', {pattern: 'yyyy-MM-dd HH:mm:ss'});
-//生成枚举值
-mockData.randomSpecial('enum', {enum: ['男', '女']});
-//生成时间戳
-mockData.randomSpecial('timeStamp', {start：1612108800000, end: 1614527999999});
+randomBase.string(6);
+//生成整数 min max 生成78-999之间的整数
+randomBase.integer(78,999);
+Mock.mock('@integer(78)') // 生成大于78的整数
+//生成浮点数 生成整数位为3-5之间，小数位为2位的浮点数 4.23
+randomBase.float(3,5,2);
+//生成现在的时间 按照指定模板返回时间字符串
+randomBase.now('yyyy-MM-dd HH:mm:ss');
+//生成时间戳 start end
+const start = new Date('2022-01-01T00:00:00.000Z');
+const end = new Date('2022-12-31T23:59:59.999Z');
+randomBase.timestamp(start,end);
 ```
 
 ##### 4.生成复杂数据类型的数据
 
-mockData.randomComplex(type: 'array'|'object', config?: Config): array|object
-
 ```ts
-import {MockData} form 'mock';
+import randomComplex form 'randomComplex'
+import Mock from 'mock'
 
-const mockData = new MockData();
 //生成随机类型数组 随机长度  或指定长度范围min max
-mockData.randomComplex('array');
-//生成指定类型数组 指定长度  或指定长度范围min max ['1', '2']
-mockData.randomComplex('array', {len: 2, item: {type: 'string'}});
+randomComplex.array(3,8);
+//生成指定类型数组 指定长度  指定生成格式
+randomComplex.array('@string()',3,8);
 //生成随机生成key值对象
-mockData.randomComplex('object');
+randomComplex.object(3);
 //生成指定key值对象
-mockData.randomComplex('object', {properties: {id: {type: 'string'}}});
+randomComplex.object({
+    name: '@string()',
+    'childs|4': '@cword()'
+});
+//生成的数据为
+{
+    name: '2445',
+    childs: ['十点','十点','发说','第三方']
+}
 ```
 
 ##### 5.根据mock模板生成js对象
 
-mockData.jsonData(config: Config): array|object
+生成大量数据也可根据模板进行配置数组
+
+```ts
+import Mock from 'mock'
+
+// json模板
+const json = `{
+            "name": "@string(upper,10)",
+            "age": "@natural(0,100)",
+            "isMale": "@boolean()",
+            "phone": "@phone()",
+            "email": "@email()",
+            "hobbies|3": "@string(5)"
+          }`;
+Mock.jsonToMock(json);
+
+// 根据配置对象生成mock数据
+Mock.mock(JSON.parse(json));
+```
+
+##### 6.自定义生成类型
 
 生成大量数据也可根据模板进行配置数组
 
 ```ts
-import {MockData} form 'mock';
+import Mock from 'mock'
 
-const mockData = new MockData();
-
-//key值为形成对象的key，json中的value配置的对象，type为形成的数据类型，min最小值，max最大值，len为长度，properties为对象内容的配置，item为数组内容的配置。
-const objectJson = {
-    "user": {
-        "type": "object",
-        "properties": {
-            "id": {
-                "type": "number"
-            },
-            "hobbies": {
-                "type": "array",
-                "len": 4,
-                "item": {
-                    "type": "string",
-                }
-            }
-        }
-    }
-}
-
-// 更清晰的模板 但需要解析模板 可能无法实现
-const simpleJson = {
-    code: 0,
-    data: {
-      "list|0-11": [ // 生成满足下列对象模板的0-11之间的数组
-        {
-          companyID: "@uuid(1, 100)", //生成uuid类型范围在1-100之间
-          email: "@cword(1,20)", //
-          isCurrentUser: "@boolean()", //生成布尔类型
-          loginTime: "@date('yyyy-MM-dd')", //生成满足yyyy-MM-dd格式的日期
-        },
-      ],
-      total: "@natural(1, 100)", //生成自然数
-    }
-};
-
-const config = JSON.parse(objectJson);
-mockData.jsonData(config);
+//不能自定义已存在的方法
+//定义
+Mock.extend('uuid', (val: number) => val + 1)
+//使用
+Mock.mock('@uuid(1)');
 ```
 
