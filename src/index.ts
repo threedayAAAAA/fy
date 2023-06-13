@@ -1,159 +1,64 @@
-import { Response } from "./const.js";
-import getResponseMock from "./mock.js";
 
-const template = {
-    name: 'info',
-    description: '）',
-    properties: [{
-        name: "username",
-        description: '）',
-        required: true,
-        schema: {
-            type: 'string',
-            enums: [],
-            properties: [],
-        }
-    }, {
-        name: "phone",
-        description: '',
-        required: true,
-        schema: {
-            type: 'array',
-            enums: [],
-            // properties: [],
-            properties: [{
-                name: "domain",
-                description: '',
-                required: true,
-                schema: {
-                    type: 'string',
-                    pattern: /^1[3-9]\d{9}$/,
-                    enums: [],
-                    properties: [],
-                }
-            }],
-        }
-    }, {
-        name: "uuId",
-        description: '',
-        required: true,
-        schema: {
-            type: 'string',
-            enums: [],
-            properties: [],
-        }
-    }, {
-        name: "domain",
-        description: '',
-        required: true,
-        schema: {
-            type: 'array',
-            enums: [],
-            properties: [{
-                name: "domain",
-                description: '',
-                required: true,
-                schema: {
-                    type: 'string',
-                    enums: [],
-                    properties: [],
-                }
-            }],
-        }
-    }, {
-        name: "app_type",
-        description: '',
-        required: true,
-        schema: {
-            type: 'object',
-            enums: [],
-            properties:[{
-                name: "limit",
-                description: '',
-                required: true,
-                schema: {
-                    type: 'number',
-                    enums: [],
-                    properties: [],
-                }
-            }, {
-                name: "sort_direction",
-                description: '',
-                required: true,
-                schema: {
-                    type: 'string',
-                    enums: ['DESC', 'ASC'],
-                    properties: [],
-                }
-            }, {
-                name: "grade",
-                description: '',
-                required: true,
-                schema: {
-                    type: 'object',
-                    enums: [],
-                    properties: [{
-                        name: "class",
-                        description: '',
-                        required: true,
-                        schema: {
-                            type: 'number',
-                            enums: [],
-                            max: 10,
-                            min: 1,
-                            properties: [],
-                        }
-                    }, {
-                        name: "teacher_name",
-                        description: '',
-                        required: true,
-                        schema: {
-                            type: 'string',
-                            enums: [],
-                            properties: [],
-                        }
-                    }, {
-                        name: "hobbies",
-                        description: '',
-                        required: true,
-                        schema: {
-                            type: 'array',
-                            enums: [],
-                            properties: [{
-                                name: "",
-                                description: '',
-                                required: true,
-                                schema: {
-                                    type: 'string',
-                                    enums: ['篮球', '跑步', '跳高', '跳远', '游泳'],
-                                    properties: [],
-                                }
-                            }],
-                        }
-                    }],
-                }
-            }]
-        }
-    }],
-    schema: {
-        type: 'string',
-        enums: [],
-        properties: [],
-    }
-}
+import {
+    apply,
+    array,
+    bool,
+    constant,
+    number,
+    oneOf,
+    templateObject,
+    string,
+    date,
+    phone,
+    idCard,
+    email } from  './lib/index.js';
+export { randomBool, randomChar, randomNumber, randomString } from './lib/random/index.js';
+export { Mocker } from './mocker.js';
+export { randomEmail } from './lib/email.js';
+export { randomIdCard} from './lib/idCard.js';
+export { randomPhone } from './lib/phone.js';
+export { randomDate } from './lib/date.js';
+export const M = { apply, array, bool, constant, number, oneOf, templateObject, string, date, phone, idCard, email };
 
-const getMultiMockData = (template: Response, len: number) => {
-    if (len < 0 ) throw new Error();
-    if (!Object.keys(template).length) throw new Error();
-    let response = [];
-    for (let i = 0; i < len - 1; i++) {
-        let res = getResponseMock(template);
-        response.push(res);
-    }
+// const m = M.array(M.templateObject({
+//   id: M.number(100, 1000000),     	
+//   name: M.string(6),                	
+//   sex: M.oneOf(['male', 'female']),                    
+//   city: M.constant('shenzhen'),          
+//   work: M.oneOf(['DESC', 'ASC']),
+//   date: M.date('YYYY-MM-DD hh:mm:ss'),
+//   bool: M.bool(0.7),
+//   phone: M.phone(),
+//   idCard: M.idCard(),
+//   email: M.email()
+// }), 5);                               
 
-    return response
-}
-const res = getMultiMockData(template, 5);
-console.log(res);
+// console.log(m.mock());
 
-export default getMultiMockData;
+// const test = () => M.array(M.bool(1), 5)
+
+// const randomTest = () => {
+//     return M.apply(test);
+// }
+
+
+
+// console.log(randomTest().mock().mock())
+
+// const m = M.array(M.templateObject({
+//   id: M.number(100, 1000000),     	
+//   name: M.string(6),                	
+//   sex: M.oneOf(['male', 'female']),                    
+//   city: M.constant('shenzhen'),          
+//   work: M.oneOf(['DESC', 'ASC']),
+//   date: M.date('YYYY-MM-DD hh:mm:ss'),
+//   bool: M.bool(0.7),
+//   phone: M.phone(),
+//   idCard: M.idCard(),
+//   email: M.email(),
+//   uuid: randomUuid(),
+// }), 2);  
+
+// console.log(m.mock());
+// console.log(M.array(M.string()).mock())
+// console.log(M.templateObject({name: M.string()}).mock())
