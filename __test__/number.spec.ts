@@ -45,7 +45,7 @@ describe('number', () => {
             const result = floatNum(1, 10, 2)
             expect(result).toBeGreaterThanOrEqual(1)
             expect(result).toBeLessThanOrEqual(10)
-            expect(result.toString().split('.')[1].length).lessThanOrEqual(2)
+            expect(result.toString().split('.')[1].length).equal(2)
         })
 
         it('当未指定范围时，返回默认范围内的浮点数', () => {

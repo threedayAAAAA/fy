@@ -80,13 +80,6 @@ describe('mockData', () => {
             expect(result).toBeLessThanOrEqual(Number.MAX_SAFE_INTEGER)
         })
 
-        it('当提供的min和max参数不是数字时，应该抛出TypeError', () => {
-            //@ts-ignore
-            expect(() => mockData.number('1', 10)).toThrow('min和max应该是数字')
-            //@ts-ignore
-            expect(() => mockData.number(1, '10')).toThrow('min和max应该是数字')
-        })
-
         it('当提供的min大于max时，应该抛出RangeError', () => {
             expect(() => mockData.number(10, 1)).toThrow('max < min')
         })
@@ -196,13 +189,13 @@ describe('mockData', () => {
             expect(result).toEqual([])
         })
 
-        it('如果提供的长度为1000，则返回1000长度的数组，时间在20ms内', () => {
+        it('如果提供的长度为100000，则返回100000长度的数组，时间在1500ms内', () => {
             const before = new Date().getTime()
-            const result = mockData.array(1000, mockData.time)
+            const result = mockData.array(100000, mockData.time)
             const after = new Date().getTime()
 
-            expect(result.length).equal(1000)
-            expect(after - before).lessThanOrEqual(50)
+            expect(result.length).equal(100000)
+            expect(after - before).lessThanOrEqual(1500)
         })
     })
 
@@ -210,7 +203,7 @@ describe('mockData', () => {
     describe('template', () => {
         //常规替换
         it('应该正确替换模板中的占位符', () => {
-            const template = '这是一个字符串模板，@string @number|1-2 @boolean @time'
+            const template = '这是一个字符串模板，@string|10|asdf @number|1|10 @boolean @time'
             const result = mockData.template(template)
             expect(result).toMatch(new RegExp(stringRegString, 'g'))
             expect(result).toMatch(new RegExp(numberRegString, 'g'))
@@ -231,9 +224,10 @@ describe('mockData', () => {
         })
 
         it('应该正确处理只有占位符的模板', () => {
-            const template = '@string'
+            const template = '@string|5|a'
             const result = mockData.template(template)
-            expect(result).toMatch(new RegExp(stringRegString, 'g'))
+            expect(result).equal('aaaaa')
+
             expect(mockData.template('@boolean')).toBeTypeOf('boolean')
         })
     })
@@ -412,6 +406,15 @@ describe('mockData', () => {
             expect(mockData.template('@test1 test1')).toBe(`${generator1()} test1`)
             expect(mockData.template('@test1 test2 @test2')).toBe(
                 `${generator1()} test2 ${generator2()}`,
+            )
+        })
+
+        it('生成器函数也能接受到参数', () => {
+            const generator1 = (...params: any[]) => params.join(',')
+            mockData.define('test1', generator1)
+            expect(mockData.template('@test1 test2')).toBe(`${generator1()} test2`)
+            expect(mockData.template('@test1|3|ad|onq2 test1')).toBe(
+                `${generator1('3', 'ad', 'onq2')} test1`,
             )
         })
     })

@@ -1,37 +1,42 @@
-import { MockData, Generate, MockObject, MockArray } from '@/type'
+import {
+    MockDataType,
+    Generate,
+    MockObject,
+    MockArray,
+    MaybeNumber,
+    MockTemplateType,
+} from '@/type'
 import { isFunction, isNil, isObject, isString, isUndefined, sample } from 'lodash'
 import { mockNumber, mockText, mockBoolean, mockDate } from './base'
-import { MockDateClass, isOwnKeyof } from './utils'
+import { MockDateClass, isOwnKeyof, parseIntDefault } from './utils'
 import { textPools } from './const'
+import { MockTemplate } from './mockTemplate'
 
-export class Mock implements MockData {
-    private templateMap: Record<string, Generate<any>> = {
-        ...mockText,
-        ...mockNumber,
-        ...mockBoolean,
-        ...mockDate,
-
-        string: this.string,
-        number: this.number,
-        boolean: this.boolean,
-        time: this.time,
-    }
-
-    private get formatPatterRegex() {
-        //转化成 匹配 /@(aFunc|bFunc)/
-        return new RegExp(
-            `@(${Object.keys(this.templateMap).join('|')})(?:\|\w+(?:-\w+)?)?(?:\|\w+)?`,
-            'g',
-        )
-    }
+export class Mock implements MockDataType {
+    private mockTemplate: MockTemplateType
 
     constructor(templateMap?: Record<string, () => any | string>) {
-        if (templateMap) {
-            Object.entries(templateMap).forEach(([key, func]) => this.define(key, func))
-        }
+        this.mockTemplate = new MockTemplate({
+            ...mockText,
+            ...mockNumber,
+            ...mockBoolean,
+            ...mockDate,
+
+            string: this.string,
+            number: this.number,
+            boolean: this.boolean,
+            time: this.time,
+            ...templateMap,
+        })
     }
 
-    string(length: number = 10, textPool = textPools.alpha): string {
+    template(template: string): any {
+        return this.mockTemplate.judgeRawData(template)
+            ? this.mockTemplate.templateRaw(template)
+            : this.mockTemplate.templateString(template)
+    }
+
+    string(length: MaybeNumber = 10, textPool = textPools.alpha): string {
         return mockText.text({
             min: length,
             max: length,
@@ -39,11 +44,8 @@ export class Mock implements MockData {
         })
     }
 
-    number(min?: number, max?: number, toFixed = 0): number {
-        if (isString(min) || isString(max)) {
-            throw new TypeError('min和max应该是数字')
-        }
-        if (!isUndefined(min) && !isUndefined(max) && min > max) {
+    number(min?: MaybeNumber, max?: MaybeNumber, toFixed = 0): number {
+        if (!isUndefined(min) && !isUndefined(max) && parseIntDefault(min) > parseIntDefault(max)) {
             throw new RangeError('max < min')
         }
         return mockNumber.floatNum(min, max, toFixed)
@@ -84,23 +86,6 @@ export class Mock implements MockData {
         }
     }
 
-    template(template: string): any {
-        //单个key特殊处理
-        const maybeKey = template.split('@')[1]
-        if (isOwnKeyof(this.templateMap, maybeKey)) {
-            const func = this.templateMap[maybeKey] as Function | string
-            return isFunction(func) ? func() : func
-        }
-
-        return template.replace(
-            this.formatPatterRegex,
-            ($0: string, p: string, ...params): string => {
-                const func = this.templateMap[p] as Function | string
-                return isFunction(func) ? func().toString() : func
-            },
-        )
-    }
-
     templateArray(template: MockArray): MockArray {
         return template.map(value => this.templateUnknown(value))
     }
@@ -114,6 +99,6 @@ export class Mock implements MockData {
     }
 
     define<T = any>(name: string, generator: Generate<T>): void {
-        this.templateMap[name] = generator
+        this.mockTemplate.define(name, generator)
     }
 }
