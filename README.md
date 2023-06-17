@@ -1,12 +1,13 @@
-使用 `pnpm i`安装依赖
-使用 `pnpm test`执行单测
+* 使用 `pnpm i`安装依赖
+* 使用 `pnpm test`执行单测
 
 ### 如何使用
 * 支持生成随机字符串、数字、布尔值、日期、时间等基本数据类型。
 * 支持生成对象、数组等复杂数据类型。
 * 支持自定义数据类型。
-* 支持生成符合特定规则的数据，生成指定范围内的数字、指定长度的字符串、指定格式的日期等；
+* 支持生成符合特定规则的数据，生成指定范围内的数字、指定长度的字符串、指定格式的日期等。
 * 支持根据数据模板生成数据，根据一个 JSON 模板生成符合该模板的数据。
+* 支持自定义规则，使用自定义规则生成数据。
 ```
 export const Mock: Record<string, Function> = {
     ...mockNumber,
@@ -18,12 +19,14 @@ export const Mock: Record<string, Function> = {
     mockUndefined,
     mockObject,
     mockArray,
+
+    addCustomMock,
 }
 ```
-数字支持生成随机整数、随机浮点数、随机自然数
-日期支持生成随机时间戳、随机日期字符串、随机时间字符串、指定格式的日期
-自定义数据支持生成随机身份证号码、随机手机号码
-支持自定义规则，按照自定义规则生成随机数据
+* 数字支持生成随机整数、随机浮点数、随机自然数
+* 日期支持生成随机时间戳、随机日期字符串、随机时间字符串、指定格式的日期
+* 自定义数据支持生成随机身份证号码、随机手机号码
+* 支持自定义规则，按照自定义规则生成随机数据
 
 ## 生成随机的string
 ```
@@ -38,6 +41,15 @@ Mock.mockString({ length: 5, chars: 'abc' }) // 字符范围为abc的长度5的�
 * @returns 一个随机字符串
 
 ## 生成随机的number
+mockInt生成随机整数，使用mockNatural生成随机自然数，
+* @param 包括以下属性：
+*   - min: 最小值
+*   - max: 最大值
+mockFloat生成随机浮点数，
+* @param 包括以下属性：
+*   - min: 最小值
+*   - max: 最大值
+*   - decimalPlaces: 保留几位小数
 ```
 import { Mock } from 'mock'
 Mock.mockInt({ min: 10, max: 20 }) // 10-20范围的随机整数
@@ -55,6 +67,9 @@ import { Mock } from 'mock'
 Mock.mockBool()
 ```
 ## 生成随机date数据
+mockTimestamp 生成随机时间戳
+mockDate 生成随机日期字符串
+mockTime 生成随机时间字符串
 ```
 import { Mock } from 'mock'
 const min = new Date(2023, 0, 1)
@@ -93,9 +108,26 @@ Mock.mockObject(template)
 比如：
 ```
 {
-  name: '@mockString({ "length": 8, "chars": "asv" })',
+  name: '@mockString({ "length": 8, "chars": "asv" })', // name: 'svassvav'
 }
 则name的值为随机生成的长度为8，字符包含asv的字符串。需要注意，参数对象需要符合JSON格式，目前只支持传入JSON格式
+```
+生成嵌套对象：
+```
+const template = {
+  name: '@mockString',
+  age: '@mockInt',
+  address: {
+    province: '@mockString',
+    city: '@mockString',
+    street: {
+      name: '@mockString',
+      number: '@mockInt',
+    },
+  },
+  date: '@mockDate'
+}
+const result = Mock.mockObject(template)
 ```
 ## 生成随机数组
 ```
@@ -108,6 +140,17 @@ Mock.mockArray(template) // 生成随机长度为3的数组，第一个为随机
 ```
 const template = [1]
 Mock.mockArray(template, 3) // 生成[1,1,1]
+```
+生成数组嵌套：
+```
+const template = [
+  {
+    name: '@mockString',
+    age: '@mockInt',
+    tags: ['@mockString'],
+  },
+]
+const result = Mock.mockArray(template)
 ```
 
 ## 生成随机手机号码
