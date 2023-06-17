@@ -1,9 +1,11 @@
-import mockGenerator from './mockGenerator/index';
-import { generateData } from './codeGenerator/index';
+export * from './mockGenerator/boolean';
+export * from './mockGenerator/common';
+export * from './mockGenerator/number';
+export * from './mockGenerator/string';
+export * from './mockGenerator/date';
 
-const Mock = {
-  Mock: generateData,
-  Random: mockGenerator,
-};
+import { DataGenerator } from './dataGenerator/index';
+
+const Mock = new DataGenerator();
 
 export default Mock;

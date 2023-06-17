@@ -1,3 +1,5 @@
+import type { SafeAny } from 'src/types';
+
 type ValueType =
   | 'null'
   | 'array'
@@ -10,7 +12,7 @@ type ValueType =
   | 'object'
   | 'function';
 
-export function getType(value: any): ValueType {
+export function getType(value: SafeAny): ValueType {
   if (value === null) {
     return 'null';
   } else if (Array.isArray(value)) {

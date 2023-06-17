@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "target": "es2020",
+    "target": "esnext",
     "module": "esnext",
     "strict": true,
     "esModuleInterop": true,
@@ -14,7 +14,8 @@
     "outDir": "dist",
     "resolveJsonModule": true,
     "declaration": true,
+    "lib": ["ES2015", "ESNext", "DOM"]
   },
-  "include": ["src/**/*", "types/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.test.ts"]
 }

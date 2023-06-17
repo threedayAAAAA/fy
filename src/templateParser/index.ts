@@ -1,17 +1,19 @@
 import type { KeyRule } from './type';
+import type { SafeAny, VKey } from 'src/types';
 
-import { isUndefined, isFunction } from 'lodash-es';
-import { NUM_RANGE_REG, PLACEHOLDER_REG } from '../const/reg';
-import mockGenerator from '../mockGenerator';
+import { isString } from 'lodash-es';
+import { NUM_RANGE_REG } from '../const/reg';
+import { randomInt } from '../mockGenerator/number';
 import { Logger } from '../util/logger';
 import { POSITION } from './const';
+import { parseDecInt } from 'src/util/number';
 
 /**
  * 解释参数
  * @param str 待解析参数字符串
  * @returns 参数数组
  */
-export function parseArgs(str: string): any[] {
+export function parseArgs(str: string): SafeAny[] {
   try {
     return JSON.parse(`[${str}]`);
   } catch (e) {
@@ -25,8 +27,12 @@ export function parseArgs(str: string): any[] {
  * @param key 需要解析的键名
  * @returns 解析键名后产生的模板生成规则
  */
-export function parserKey(key?: string | number): KeyRule {
-  key = isUndefined(key) ? '' : key.toString();
+export function parserKey(key: VKey = ''): KeyRule {
+  if (!isString(key)) {
+    return {
+      keyName: key,
+    };
+  }
   const match = key.split('|');
 
   if (match.length < 2) {
@@ -39,11 +45,12 @@ export function parserKey(key?: string | number): KeyRule {
   if (!rangeMatch) {
     return { keyName: key };
   }
+
   const keyName = match[0];
 
-  let [min, max] = [parseInt(rangeMatch[1], 10), parseInt(rangeMatch[2], 10)];
+  const [min, max] = [parseDecInt(rangeMatch[1]), parseInt(rangeMatch[2], 10)];
 
-  const count = !isNaN(min) && !isNaN(max) ? mockGenerator.integer(min, max) : !isNaN(min) ? min : undefined;
+  const count = !isNaN(min) && !isNaN(max) ? randomInt(min, max) : !isNaN(min) ? min : undefined;
 
   return {
     keyName,
@@ -51,30 +58,4 @@ export function parserKey(key?: string | number): KeyRule {
     min: isNaN(min) ? undefined : min,
     max: isNaN(max) ? undefined : max,
   };
-}
-
-/**
- * 解析占位符
- * @param placeholderStr 占位符
- * @returns 执行完占位符后产生的结果
- */
-export function parsePlaceholder(placeholderStr: string): any {
-  const match = placeholderStr.match(PLACEHOLDER_REG);
-  if (!match || !match[1]) return placeholderStr;
-
-  const key = match[1].toLowerCase();
-
-  const mockFunc = Object.entries(mockGenerator).find(([k]) => k.toUpperCase() === key.toUpperCase())?.[1];
-
-  if (!mockFunc) {
-    return placeholderStr;
-  }
-
-  const params = match[2] ? parseArgs(match[2]) : [];
-
-  if (isFunction(mockFunc)) {
-    return mockFunc(...params) ?? '';
-  }
-
-  return '';
 }
