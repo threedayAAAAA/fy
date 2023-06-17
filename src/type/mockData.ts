@@ -6,7 +6,24 @@ export interface MockDateType extends Date {
     format: typeof formatDate
 }
 
-export interface MockData {
+export interface MockTemplateType {
+    templateMap: Record<string, Generate<any>>
+    formatPatterRegex: RegExp
+
+    judgeRawData: (template: string) => boolean
+    templateRaw: (template: string) => any
+    templateString: (template: string) => string
+
+    /**
+     * 自定义生成器
+     * @template T
+     * @param {string} name 生成器名称
+     * @param {Generate} generator 生成器函数或字符串
+     */
+    define<T>(name: string, generator: Generate<T>): void
+}
+
+export interface MockDataType {
     /**
      * 生成指定长度和字符集的字符串
      * @param {number} [length=10] 字符串长度
@@ -57,21 +74,6 @@ export interface MockData {
     array<T>(length: number, ...generators: Generate<T>[]): Array<T | string>
 
     /**
-     * 自定义生成器
-     * @template T
-     * @param {string} name 生成器名称
-     * @param {Generate} generator 生成器函数或字符串
-     */
-    define<T>(name: string, generator: Generate<T>): void
-
-    /**
-     * 将模板字符串中的占位符替换为随机数据
-     * @param {string} template 模板字符串
-     * @returns {string} 替换后的字符串
-     */
-    template(template: string): string
-
-    /**
      * 将模板对象中的每个属性值都进行模板替换
      * @param {MockObject} template 模板对象
      * @returns {MockObject} 替换后的对象
@@ -86,8 +88,17 @@ export interface MockData {
     templateArray(template: MockArray): MockArray
 
     /**
-     * 根据数据模板生成数据
-     * @param template 数据模板，用于指定数据的结构和类型
+     * 将模板字符串中的占位符替换为随机数据
+     * @param {string} template 模板字符串
+     * @returns {string} 替换后的字符串
      */
     template(template: string): string
+
+    /**
+     * 自定义生成器
+     * @template T
+     * @param {string} name 生成器名称
+     * @param {Generate} generator 生成器函数或字符串
+     */
+    define<T>(name: string, generator: Generate<T>): void
 }

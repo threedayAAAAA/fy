@@ -22,6 +22,7 @@
   - [Generator](#generator)
   - [生成基础类型数据](#生成基础类型数据)
   - [生成复杂类型数据](#生成复杂类型数据)
+  - [自定义生成器](#自定义生成器)
   - [生成自定义数据类型](#生成自定义数据类型)
   - [生成模板数据](#生成模板数据)
 
@@ -97,7 +98,7 @@ base文件夹内有四类自带的生成器
   - phone
   - ID
 
-- TODO：所有生成器均可在模板中使用@<Generator函数名>直接使用,不能传入函数参数，以后再~~抄一下~~优化  => 函数入参不一致导致整体无法做适配,放弃
+- TODO：所有生成器均可在模板中使用@<Generator函数名>直接使用,不能传入函数参数，以后再~~抄一下~~优化  => 函数入参不一致导致整体无法做适配,放弃 => 我做到了!!!
 - ~~TODO：额外注意template函数返回值是字符串，不是函数返回值类型（考虑匹配全字符串就是一个key命中的时候映射实际函数~~
 
 ## 生成基础类型数据
@@ -123,8 +124,24 @@ base文件夹内有四类自带的生成器
   const stringObject = mock.templateObject({
     '@string': '@string'
   }) // => {key:value}的一个随机对象，key为某个字符串,value为某个字符串
+```
 
+## 自定义生成器 
 
+``` ts
+  import { Mock } from 'mock-data'
+  const mock = new Mock({uuid})
+
+  const func = (key)=>{
+    return {
+      'a':"aaaaa",
+      'b':"bbbb"
+    }[key]||'noKey'
+  }
+  mock.define('mock',mock)
+  mock.template('@mock') //=>  'noKey'
+  mock.template('@mock|a') //=>  'aaaaa'
+  mock.template('@mock|b') //=>  'bbbb'
 ```
 
 ## 生成自定义数据类型
@@ -134,7 +151,7 @@ base文件夹内有四类自带的生成器
 
 
   //我需要一个uuid，格式是5个随机字母-5个随机数字-时间（格式化为 时：分：秒 月 年）的整体字符串
-  const uuid = ()=> `${Mock.string(5)}-${Mock.number(10000, 50000)}-${Mock.date().format('HH:mm:ss MM yyyy')}`
+  const uuid = (idPreLength = 5)=> `${Mock.string(idPreLength)}-${Mock.number(10000, 50000)}-${Mock.date().format('HH:mm:ss MM yyyy')}`
 
   //生成的这个mock示例将可以模板格式化@uuid
   const mock = new Mock({uuid})
@@ -158,7 +175,7 @@ base文件夹内有四类自带的生成器
       key: '@uuid', //uuid
       name: '@string', //某个字符串
       now: '@time', // 固定格式的时间字符串
-      hasSomething: mock.boolean() //不能使用@boolean, 所有模板生成的为纯字符串，需要原始格式的要把原函数在这里执行
+      hasSomething: '@boolean' //布尔值
       someTags: mock.array(mock.number(5,10), mock.string) //5~10个字符串的数组
     })
   }
